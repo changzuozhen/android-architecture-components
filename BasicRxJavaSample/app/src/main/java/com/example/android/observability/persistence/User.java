@@ -55,4 +55,12 @@ public class User {
     public String getUserName() {
         return mUserName;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "mId='" + mId + '\'' +
+                ", mUserName='" + mUserName + '\'' +
+                '}';
+    }
 }

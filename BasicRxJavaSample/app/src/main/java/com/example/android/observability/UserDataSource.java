@@ -33,6 +33,8 @@ public interface UserDataSource {
      */
     Flowable<User> getUser();
 
+    Flowable<User []> getAllUsers();
+
     /**
      * Inserts the user into the data source, or, if this is an existing user, updates it.
      *
@@ -43,5 +45,5 @@ public interface UserDataSource {
     /**
      * Deletes all users from the data source.
      */
-    void deleteAllUsers();
+    int deleteAllUsers();
 }

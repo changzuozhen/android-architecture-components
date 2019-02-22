@@ -51,6 +51,16 @@ public class UserViewModel extends ViewModel {
 
     }
 
+    public Flowable<String> getAllUserName() {
+        return mDataSource.getAllUsers().map(users -> {
+            StringBuilder usersSb = new StringBuilder("users:");
+            for (User user : users) {
+                usersSb.append(user);
+            }
+            return usersSb.toString();
+        });
+    }
+
     /**
      * Update the user name.
      *
@@ -65,5 +75,14 @@ public class UserViewModel extends ViewModel {
                 ? new User(userName)
                 : new User(mUser.getId(), userName);
         return mDataSource.insertOrUpdateUser(mUser);
+    }
+
+    public Completable insertUserName(final String userName) {
+        return mDataSource.insertOrUpdateUser(new User(userName));
+    }
+
+    public int deleteAllUsers() {
+        mUser = null;
+        return mDataSource.deleteAllUsers();
     }
 }

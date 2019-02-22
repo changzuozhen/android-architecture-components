@@ -16,15 +16,16 @@
 
 package com.example.android.observability.persistence;
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.room.Room;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.room.Room;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 
 /**
  * Test the implementation of {@link UserDao}
@@ -73,6 +74,7 @@ public class UserDaoTest {
                 // assertValue asserts that there was only one emission of the user
                 .assertValue(user -> {
                     // The emitted user is the expected one
+                    System.out.println("UserDaoTest.insertAndGetUser getUser " + user);
                     return user != null && user.getId().equals(USER.getId()) &&
                             user.getUserName().equals(USER.getUserName());
                 });

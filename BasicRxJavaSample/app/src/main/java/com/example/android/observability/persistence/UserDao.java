@@ -38,6 +38,10 @@ public interface UserDao {
     @Query("SELECT * FROM Users LIMIT 1")
     Flowable<User> getUser();
 
+
+    @Query("SELECT * FROM Users")
+    Flowable<User []> getAllUsers();
+
     /**
      * Insert a user in the database. If the user already exists, replace it.
      *
@@ -50,5 +54,5 @@ public interface UserDao {
      * Delete all users.
      */
     @Query("DELETE FROM Users")
-    void deleteAllUsers();
+    int deleteAllUsers();
 }

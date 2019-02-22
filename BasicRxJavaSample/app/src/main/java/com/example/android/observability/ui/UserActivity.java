@@ -16,15 +16,20 @@
 
 package com.example.android.observability.ui;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import com.example.android.observability.Injection;
 import com.example.android.persistence.R;
+
+import java.util.concurrent.Callable;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -48,6 +53,7 @@ public class UserActivity extends AppCompatActivity {
     private UserViewModel mViewModel;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
+    private TextView mUserList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +61,53 @@ public class UserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user);
 
         mUserName = findViewById(R.id.user_name);
+        mUserList = findViewById(R.id.user_list);
         mUserNameInput = findViewById(R.id.user_name_input);
         mUpdateButton = findViewById(R.id.update_user);
 
         mViewModelFactory = Injection.provideViewModelFactory(this);
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(UserViewModel.class);
         mUpdateButton.setOnClickListener(v -> updateUserName());
+
+        findViewById(R.id.add_user).setOnClickListener(v -> {
+            String userName = mUserNameInput.getText().toString();
+            mDisposable.add(mViewModel.insertUserName(userName)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(() -> {
+                                Log.d(TAG, "⚠️add_user success");
+                            },
+                            throwable -> Log.e(TAG, "Unable to update username", throwable)));
+
+        });
+        findViewById(R.id.list_user).setOnClickListener(v -> {
+            mDisposable.add(mViewModel.getAllUserName()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((users) -> {
+                                Log.d(TAG, "⚠️list_user success " + users);
+                            },
+                            throwable -> Log.e(TAG, "Unable to update username", throwable)));
+
+        });
+
+        findViewById(R.id.delete_user).setOnClickListener(v -> {
+
+            mDisposable.add(
+                    Completable.fromCallable(new Callable<Integer>() {
+                        @Override
+                        public Integer call() throws Exception {
+                            return mViewModel.deleteAllUsers();
+                        }
+                    })
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(() -> {
+                                        Log.d(TAG, "⚠️delete_user success rows: ");
+                                    },
+                                    throwable -> Log.e(TAG, "Unable to update username", throwable)));
+        });
+
     }
 
     @Override
@@ -73,6 +120,11 @@ public class UserActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(userName -> mUserName.setText(userName),
+                        throwable -> Log.e(TAG, "Unable to update username", throwable)));
+        mDisposable.add(mViewModel.getAllUserName()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userName -> mUserList.setText(userName),
                         throwable -> Log.e(TAG, "Unable to update username", throwable)));
     }
 
@@ -96,4 +148,6 @@ public class UserActivity extends AppCompatActivity {
                 .subscribe(() -> mUpdateButton.setEnabled(true),
                         throwable -> Log.e(TAG, "Unable to update username", throwable)));
     }
+
+
 }

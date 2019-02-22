@@ -38,12 +38,17 @@ public class LocalUserDataSource implements UserDataSource {
     }
 
     @Override
+    public Flowable<User[]> getAllUsers() {
+        return mUserDao.getAllUsers();
+    }
+
+    @Override
     public Completable insertOrUpdateUser(User user) {
        return mUserDao.insertUser(user);
     }
 
     @Override
-    public void deleteAllUsers() {
-        mUserDao.deleteAllUsers();
+    public int deleteAllUsers() {
+        return mUserDao.deleteAllUsers();
     }
 }
