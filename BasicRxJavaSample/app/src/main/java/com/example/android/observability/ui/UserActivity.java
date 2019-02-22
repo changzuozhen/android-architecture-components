@@ -77,35 +77,31 @@ public class UserActivity extends AppCompatActivity {
                     .subscribe(() -> {
                                 Log.d(TAG, "⚠️add_user success");
                             },
-                            throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                            throwable -> Log.e(TAG, "⚠️Unable to ️add_user ", throwable)));
 
         });
         findViewById(R.id.list_user).setOnClickListener(v -> {
-            mDisposable.add(mViewModel.getAllUserName()
+            long time = System.currentTimeMillis();
+            mViewModel.getAllUserName()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .take(1)
                     .subscribe((users) -> {
-                                Log.d(TAG, "⚠️list_user success " + users);
+                                Log.d(TAG, "⚠️list_user success " + users + time);
                             },
-                            throwable -> Log.e(TAG, "Unable to update username", throwable)));
-
+                            throwable -> {
+                                Log.e(TAG, "⚠️Unable to list_user", throwable);
+                            });
         });
 
         findViewById(R.id.delete_user).setOnClickListener(v -> {
 
             mDisposable.add(
-                    Completable.fromCallable(new Callable<Integer>() {
-                        @Override
-                        public Integer call() throws Exception {
-                            return mViewModel.deleteAllUsers();
-                        }
-                    })
+                    Completable.fromCallable((Callable<Integer>) () -> mViewModel.deleteAllUsers())
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(() -> {
-                                        Log.d(TAG, "⚠️delete_user success rows: ");
-                                    },
-                                    throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                            .subscribe(() -> Log.d(TAG, "⚠️delete_user success rows: "),
+                                    throwable -> Log.e(TAG, "⚠️Unable to ️delete_user", throwable)));
         });
 
     }
@@ -119,13 +115,19 @@ public class UserActivity extends AppCompatActivity {
         mDisposable.add(mViewModel.getUserName()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userName -> mUserName.setText(userName),
-                        throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                .subscribe(userName -> {
+                            Log.d(TAG, "⚠️mUserName.setText " + userName);
+                            mUserName.setText(userName);
+                        },
+                        throwable -> Log.e(TAG, "⚠️Unable to mUserName.setText ", throwable)));
         mDisposable.add(mViewModel.getAllUserName()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userName -> mUserList.setText(userName),
-                        throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                .subscribe(userName -> {
+                            Log.d(TAG, "⚠️mUserList.setText");
+                            mUserList.setText(userName);
+                        },
+                        throwable -> Log.e(TAG, "⚠️Unable to ️mUserList.setText", throwable)));
     }
 
     @Override
@@ -146,7 +148,7 @@ public class UserActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> mUpdateButton.setEnabled(true),
-                        throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                        throwable -> Log.e(TAG, "⚠️Unable to update username", throwable)));
     }
 
 

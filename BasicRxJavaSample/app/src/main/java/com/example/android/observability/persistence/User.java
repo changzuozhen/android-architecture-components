@@ -56,6 +56,7 @@ public class User {
         return mUserName;
     }
 
+    @Ignore
     @Override
     public String toString() {
         return "User{" +
